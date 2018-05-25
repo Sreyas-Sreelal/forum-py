@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
+import re
 
 class User:
-    
     def __init__(self,client,id):
         self.client = client
         self.id = id
@@ -15,32 +15,33 @@ class User:
         self.client.get('http://forum.sa-mp.com/member.php?u=' + self.id)
         return self.client.find_element_by_id('last_online').text 
 
-    def getcontacts(self):
-        contacts = []
-        self.client.get('http://forum.sa-mp.com/profile.php?do=buddylist')
-        soup = BeautifulSoup(self.client.page_source,'html.parser')
-        elements = soup.find_all('a',{"title":"View Profile"})
-        #elements = self.client.find_elements_by_xpath("//*[starts-with(@href, 'member.php?u=') and contains(@title,'View Profile')]")
-        for element in elements:
-            contacts.append(User(self.client,element['href'][13:]))
-        return contacts
-
     def getforumlevel(self):
         self.client.get('http://forum.sa-mp.com/member.php?u=' + self.id)
         return self.client.find_element_by_tag_name('h2').text
 
     def getthreads(self):
-        #NOTE:need to work
+        from forum.threads import Thread
         self.client.get('http://forum.sa-mp.com/search.php?do=finduser&u=' + self.id + '&starteronly=1')
-        pass
+        soup = BeautifulSoup(self.client.page_source,'html.parser')
+        thread_elements = soup.find_all("a", id=re.compile("^thread_title_"))
 
-    def getreputation(self):
+        threads = []
+        for te in thread_elements:
+            try:
+                #print("Debug : thread id : ",te.get_attribute('id')[13:])
+                threads.append(Thread(self.client,te['id'][13:]))
+            except:
+                continue        
+        return threads
+
+    """def getreputation(self):
+        self.client.get("http://forum.sa-mp.com/search.php?do=finduser&u=" + self.id )
+        #post_element = self.client.
+        pass
+    """
+    
+    def info(self):
+        self.client.get('http://forum.sa-mp.com/member.php?u=' + self.id)
+        return self.client.find_element_by_xpath("//*[contains(@class, 'smallfont list_no_decoration profilefield_list')]").text
         
-        pass
-
-    def postcounts(self):
-        pass
-
-    def joined(self):
-        pass
     
