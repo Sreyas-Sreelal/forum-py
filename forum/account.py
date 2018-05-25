@@ -1,5 +1,5 @@
 import forum.ext.errors
-from forum.user import User
+from bs4 import BeautifulSoup
 
 class Account:
     def __init__(self,client,name,password):
@@ -9,6 +9,7 @@ class Account:
             raise forum.ext.errors.InvalidCreditinals("Couldn't login")
 
         else:
+            from forum.user import User
             self.User = User(self.client,self.id)
             self.name = name
             self.loggined = True
@@ -27,4 +28,14 @@ class Account:
             return True
         except:
             return False
-    
+
+    def getcontacts(self):
+        from forum.user import User
+        contacts = []
+        self.client.get('http://forum.sa-mp.com/profile.php?do=buddylist')
+        soup = BeautifulSoup(self.client.page_source,'html.parser')
+        elements = soup.find_all('a',{"title":"View Profile"})
+        #elements = self.client.find_elements_by_xpath("//*[starts-with(@href, 'member.php?u=') and contains(@title,'View Profile')]")
+        for element in elements:
+            contacts.append(User(self.client,element['href'][13:]))
+        return contacts
