@@ -49,7 +49,12 @@ class User:
     def info(self):
         self.client.get('http://forum.sa-mp.com/member.php?u=' + self.id)
         soup = BeautifulSoup(self.client.page_source,'html.parser')
-        return soup.find('dl',{'class':'smallfont list_no_decoration profilefield_list'}).text
-        #return self.client.find_element_by_xpath("//*[contains(@class, 'smallfont list_no_decoration profilefield_list')]").text
+        data = soup.find('dl',{'class':'smallfont list_no_decoration profilefield_list'}).text.split('\n')
+        data = list(filter(('').__ne__, data))
+        length = len(data)
+        info = {}
+        for i in range(0,length,2):
+            info[data[i]] = data[i+1]
+        return info
         
     
