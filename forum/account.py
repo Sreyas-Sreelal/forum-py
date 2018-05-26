@@ -1,5 +1,7 @@
 import forum.ext.errors
 from bs4 import BeautifulSoup
+import re
+from selenium.common.exceptions import WebDriverException
 
 class Account:
     def __init__(self,client,name,password):
@@ -23,10 +25,26 @@ class Account:
             input_password.send_keys(password)
             check_remember.click()
             self.client.find_element_by_class_name("button").click()
-            self.client.get("http://forum.sa-mp.com")
-            self.id = self.client.find_element_by_xpath("//*[starts-with(@href, 'member.php?u=')]").get_attribute('href')[36:]
+            soup = BeautifulSoup(self.client.page_source,'html.parser')
+            islimit = soup.find('b',text=re.compile('You have used up your failed login quota!'))
+
+            if islimit is not None:
+                raise forum.ext.errors.MaxLoginLimit
+            
+            try:    
+                self.client.get("http://forum.sa-mp.com")
+                check = self.client.find_element_by_id("navbar_username")
+            except:
+                check = None
+
+            if check is not None:
+                return False
+
+            soup = BeautifulSoup(self.client.page_source,'html.parser')
+            self.id = soup.find('a',href=re.compile('^member.php?u='))['href'][13:]
             return True
-        except:
+        
+        except WebDriverException:
             return False
 
     def getcontacts(self):
