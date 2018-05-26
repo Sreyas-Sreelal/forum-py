@@ -41,7 +41,7 @@ class Account:
                 return False
 
             soup = BeautifulSoup(self.client.page_source,'html.parser')
-            self.id = soup.find('a',href=re.compile('^member.php?u='))['href'][13:]
+            self.id = soup.find('a',href=re.compile('member\.php\?u='))['href'][13:]
             return True
         
         except WebDriverException:

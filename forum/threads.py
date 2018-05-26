@@ -36,7 +36,7 @@ class Thread:
     def getsubforum(self):
         self.client.get("http://forum.sa-mp.com/showthread.php?t=" + self.id)
         soup = BeautifulSoup(self.client.page_source,'html.parser')
-        sub_forums_elements = soup.find_all('a',href=re.compile('forumdisplay.php?f='))
+        sub_forums_elements = soup.find_all('a',href=re.compile('forumdisplay\.php\?f='))
         #sub_forums_elements = self.client.find_elements_by_xpath("//*[starts-with(@href, 'forumdisplay.php?f=')]")
         sub_forums = []
         for e in sub_forums_elements:
