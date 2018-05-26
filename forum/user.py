@@ -10,7 +10,7 @@ class User:
     def __getusername(self):
         request = requests.get('http://forum.sa-mp.com/member.php?u=' + self.id)
         soup = BeautifulSoup(request.content,'html.parser')
-        return str(soup.find('h1').text)
+        return str(soup.find('h1').text.strip())
         #return self.client.find_element_by_tag_name('h1').text
 
     def getlastactive(self):
@@ -34,18 +34,23 @@ class User:
         threads = []
         for te in thread_elements:
             try:
-                #print("Debug : thread id : ",te.get_attribute('id')[13:])
                 threads.append(Thread(te['id'][13:]))
             except:
                 continue        
         return threads
 
-    """def getreputation(self):
+    def getreputation(self):
         request = requests.get("http://forum.sa-mp.com/search.php?do=finduser&u=" + self.id )
-        #post_element = self.client.
-        pass
-    """
+        soup = BeautifulSoup(request.content,'html.parser')
+        post = soup.find('a',href=re.compile('^showthread\.php\?p='))['href']
+        request = requests.get("http://forum.sa-mp.com/"+post)
+        soup = BeautifulSoup(request.content,'html.parser')
+        scrap_info = soup.find('a',href=re.compile('u='+self.id)).find_next('div',{'class':'smallfont'}).find_next('div',{'class':'smallfont'}).find_next('div',{'class':'smallfont'}).find_next('div',{'class':'smallfont'}).text 
+        reputation = scrap_info[scrap_info.rfind('Reputation:')+12:].strip()
+        return reputation
+        
     
+
     def info(self):
         request = requests.get('http://forum.sa-mp.com/member.php?u=' + self.id)
         soup = BeautifulSoup(request.content,'html.parser')
