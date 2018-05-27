@@ -45,12 +45,18 @@ class User:
         post = soup.find('a',href=re.compile('^showthread\.php\?p='))['href']
         request = requests.get("http://forum.sa-mp.com/"+post)
         soup = BeautifulSoup(request.content,'html.parser')
-        scrap_info = soup.find('a',href=re.compile('u='+self.id)).find_next('div',{'class':'smallfont'}).find_next('div',{'class':'smallfont'}).find_next('div',{'class':'smallfont'}).find_next('div',{'class':'smallfont'}).text 
-        reputation = scrap_info[scrap_info.rfind('Reputation:')+12:].strip()
+        scrap_soup = soup.find('a',href=re.compile('u='+self.id)).find_next('div',{'class':'smallfont'}).find_next('div',{'class':'smallfont'}).find_next('div',{'class':'smallfont'}) 
+        scrap_info = scrap_soup.text
+        try:
+            reputation = int(scrap_info[scrap_info.rfind('Reputation:')+12:].strip())
+        except:
+            scrap_info = scrap_soup.find_next('div',{'class':'smallfont'}).text
+            try:
+                reputation = int(scrap_info[scrap_info.rfind('Reputation:')+12:].strip())
+            except:
+                reputation = 0
         return reputation
         
-    
-
     def info(self):
         request = requests.get('http://forum.sa-mp.com/member.php?u=' + self.id)
         soup = BeautifulSoup(request.content,'html.parser')
