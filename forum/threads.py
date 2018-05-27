@@ -1,6 +1,8 @@
 from bs4 import BeautifulSoup
 import re
 import requests
+from selenium.common.exceptions import WebDriverException
+import forum.ext.errors
 
 class Thread:
     def __init__(self,id):
@@ -20,10 +22,13 @@ class Thread:
         soup = BeautifulSoup(request.content,'html.parser')
         return soup.find('strong').text
 
-    def getrating(self):
+    def getrating(self,account):
+        
+        if not account.loggined:
+            raise forum.ext.errors.MustLogin            
         try:
-            request = requests.get("http://forum.sa-mp.com/showthread.php?t=" + self.id)
-            soup = BeautifulSoup(request.content,'html.parser')
+            account.client.get("http://forum.sa-mp.com/showthread.php?t=" + self.id)
+            soup = BeautifulSoup(account.client.page_source,'html.parser')
             rating_info = soup.find('img',src=re.compile('^images/rating/'))['title']
             #rating_info = self.client.find_element_by_xpath("//*[starts-with(@src, 'images/rating/rating_')]").get_attribute('title')
             rating = {}
@@ -42,3 +47,10 @@ class Thread:
         for e in sub_forums_elements:
             sub_forums.append(e.text)
         return sub_forums
+
+    
+
+
+
+
+
