@@ -72,7 +72,7 @@ class Thread:
         
         posts_raw = [p.text.strip() for p in all_post_html]
         
-        posts = [{},]
+        posts = []
         temp_dict = {}
 
         for pr in posts_raw:
