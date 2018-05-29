@@ -9,9 +9,14 @@ class User:
         self.name = self.__getusername()
         
     def __getusername(self):
-        request = requests.get('http://forum.sa-mp.com/member.php?u=' + self.id)
-        soup = BeautifulSoup(request.content,'html.parser')
-        return str(soup.find('h1').text.strip())
+        try:
+            request = requests.get('http://forum.sa-mp.com/member.php?u=' + self.id)
+            soup = BeautifulSoup(request.content,'html.parser')
+            name = str(soup.find('h1').text.strip())
+            return name
+        
+        except:
+            raise forum.ext.errors.InvalidUserId 
 
     def getlastactive(self,account):
         if not account.loggined:
