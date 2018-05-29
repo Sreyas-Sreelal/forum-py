@@ -58,3 +58,35 @@ class Account:
         for element in elements:
             contacts.append(User(element['href'][13:]))
         return contacts
+
+    def getIdFromUserName(self,username):
+        #http://forum.sa-mp.com/memberlist.php?ltr=S&pp=10000&sort=username&order=asc&ausername=SyS
+        self.client.get("http://forum.sa-mp.com/memberlist.php?ltr="+username[0]+"&pp=10000&sort=username&order=asc&ausername="+username)
+        soup = BeautifulSoup(self.client.page_source,'html.parser')
+        
+        try:
+            ausername_element = soup.find('td',{'class':'alt1Active'}).find('a')
+            ausername = ausername_element.text.strip()
+            
+            if ausername.lower() != username.lower():
+                while True:
+                    try:
+                        ausername_element = ausername_element.find_next('td',{'class':'alt1Active'}).find('a')
+                        ausername = ausername_element.text.strip()
+                        if ausername.lower() != username.lower():
+                            continue
+                        else:
+                            break
+                    except Exception as e:
+                        print(str(e))
+                        raise forum.ext.errors.InvalidUserId
+        
+        except:
+            raise forum.ext.errors.InvalidUserId
+        
+        user_link = ausername_element['href']
+        userid = user_link[user_link.find("=")+1:].strip()
+        
+        return userid
+
+
