@@ -25,3 +25,18 @@ class MustLogin(Error):
     Raised when a non-logged in attempt to process a request that needs a logged in account
     """
     pass
+
+class InvalidUserId(Error):
+    """
+    Raised when invalid user id is specified
+    """
+    pass
+
+class InvalidThreadId(Error):
+    """
+    Raised when invalid thread id is specified
+    """
+    pass
+
+
+    
