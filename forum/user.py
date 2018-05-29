@@ -19,7 +19,13 @@ class User:
 
         account.client.get('http://forum.sa-mp.com/member.php?u=' + self.id)
         soup = BeautifulSoup(account.client.page_source,'html.parser')
-        return soup.find('div',id='last_online').text
+        last_online =  soup.find('div',id='last_online').text.strip()
+        last_online = last_online[last_online.find(': ')+2:].strip()
+        last_online_dict = {}
+        last_online_dict['Date'] = last_online[:last_online.find(' ')]
+        last_online_dict['Time'] = last_online[last_online.find(' ')+2:]
+
+        return last_online_dict
 
     def getforumlevel(self):
         request = requests.get('http://forum.sa-mp.com/member.php?u=' + self.id)
@@ -41,18 +47,18 @@ class User:
         return threads
 
     def getreputation(self):
-        request = requests.get("http://forum.sa-mp.com/search.php?do=finduser&u=" + self.id )
-        soup = BeautifulSoup(request.content,'html.parser')
-        post = soup.find('a',href=re.compile('^showthread\.php\?p='))['href']
-        request = requests.get("http://forum.sa-mp.com/"+post)
-        soup = BeautifulSoup(request.content,'html.parser')
-        scrap_soup = soup.find('a',href=re.compile('u='+self.id)).find_next('div',{'class':'smallfont'}).find_next('div',{'class':'smallfont'}).find_next('div',{'class':'smallfont'}) 
-        scrap_info = scrap_soup.text
         try:
+            request = requests.get("http://forum.sa-mp.com/search.php?do=finduser&u=" + self.id )
+            soup = BeautifulSoup(request.content,'html.parser')
+            post = soup.find('a',href=re.compile('^showthread\.php\?p='))['href']
+            request = requests.get("http://forum.sa-mp.com/"+post)
+            soup = BeautifulSoup(request.content,'html.parser')
+            scrap_soup = soup.find('a',href=re.compile('u='+self.id)).find_next('div',{'class':'smallfont'}).find_next('div',{'class':'smallfont'}).find_next('div',{'class':'smallfont'}) 
+            scrap_info = scrap_soup.text
             reputation = int(scrap_info[scrap_info.rfind('Reputation:')+12:].strip())
         except:
-            scrap_info = scrap_soup.find_next('div',{'class':'smallfont'}).text
             try:
+                scrap_info = scrap_soup.find_next('div',{'class':'smallfont'}).text
                 reputation = int(scrap_info[scrap_info.rfind('Reputation:')+12:].strip())
             except:
                 reputation = 0
