@@ -91,7 +91,12 @@ class User:
             account.client.get('http://forum.sa-mp.com/member.php?u=' + self.id)
             soup = BeautifulSoup(account.client.page_source,'html.parser')
             current_activity = soup.find('div',{'id':'activity_info'}).text
-            current_activity = current_activity[current_activity.find('Current Activity:')+18:].strip()
+            idx = current_activity.find('Current Activity:')
+            
+            if idx ==-1:
+                current_activity = "Offline"
+            else:
+                current_activity = current_activity[idx+18:].strip()
         except AttributeError:
             current_activity = "Offline"    
             
