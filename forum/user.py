@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import re
 import requests
+import forum.ext.errors
 
 class User:
     def __init__(self,id):
@@ -11,19 +12,19 @@ class User:
         request = requests.get('http://forum.sa-mp.com/member.php?u=' + self.id)
         soup = BeautifulSoup(request.content,'html.parser')
         return str(soup.find('h1').text.strip())
-        #return self.client.find_element_by_tag_name('h1').text
 
-    def getlastactive(self):
-        request = requests.get('http://forum.sa-mp.com/member.php?u=' + self.id)
-        soup = BeautifulSoup(request.content,'html.parser')
+    def getlastactive(self,account):
+        if not account.loggined:
+            raise forum.ext.errors.MustLogin
+
+        account.client.get('http://forum.sa-mp.com/member.php?u=' + self.id)
+        soup = BeautifulSoup(account.client.page_source,'html.parser')
         return soup.find('div',id='last_online').text
-        #self.client.find_element_by_id('last_online').text 
 
     def getforumlevel(self):
         request = requests.get('http://forum.sa-mp.com/member.php?u=' + self.id)
         soup = BeautifulSoup(request.content,'html.parser')
         return soup.find('h2').text
-        #return self.client.find_element_by_tag_name('h2').text
 
     def getthreads(self):
         from forum.threads import Thread
