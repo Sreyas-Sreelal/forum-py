@@ -21,15 +21,17 @@ class User:
     def getlastactive(self,account):
         if not account.loggined:
             raise forum.ext.errors.MustLogin
-
-        account.client.get('http://forum.sa-mp.com/member.php?u=' + self.id)
-        soup = BeautifulSoup(account.client.page_source,'html.parser')
-        last_online =  soup.find('div',id='last_online').text.strip()
-        last_online = last_online[last_online.find(': ')+2:].strip()
-        last_online_dict = {}
-        last_online_dict['Date'] = last_online[:last_online.find(' ')]
-        last_online_dict['Time'] = last_online[last_online.find(' ')+2:]
-
+        try:
+            account.client.get('http://forum.sa-mp.com/member.php?u=' + self.id)
+            soup = BeautifulSoup(account.client.page_source,'html.parser')
+            last_online =  soup.find('div',id='last_online').text.strip()
+            last_online = last_online[last_online.find(': ')+2:].strip()
+            last_online_dict = {}
+            last_online_dict['Date'] = last_online[:last_online.find(' ')]
+            last_online_dict['Time'] = last_online[last_online.find(' ')+2:]
+        except AttributeError:
+            last_online_dict['Date'] = "Hidden" 
+            last_online_dict['Time'] = "Hidden"
         return last_online_dict
 
     def getforumlevel(self):
