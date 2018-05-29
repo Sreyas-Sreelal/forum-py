@@ -11,12 +11,16 @@ class Thread:
         self.title = self.__gettitle()
         
     def __getauthor(self):
-        from forum.user import User
-        request = requests.get("http://forum.sa-mp.com/showthread.php?t=" + self.id)
-        soup = BeautifulSoup(request.content,'html.parser')
-        #self.client.find_element_by_xpath("//*[contains(@class, 'bigusername')]").get_attribute('href')[36:]
-        return User(soup.find('a',{'class':'bigusername'})['href'][13:])
-    
+        try:
+            request = requests.get("http://forum.sa-mp.com/showthread.php?t=" + self.id)
+            soup = BeautifulSoup(request.content,'html.parser')
+            from forum.user import User
+            #self.client.find_element_by_xpath("//*[contains(@class, 'bigusername')]").get_attribute('href')[36:]
+            return User(soup.find('a',{'class':'bigusername'})['href'][13:])
+        
+        except:
+            raise forum.ext.errors.InvalidThreadId
+        
     def __gettitle(self):
         request = requests.get("http://forum.sa-mp.com/showthread.php?t=" + self.id)
         soup = BeautifulSoup(request.content,'html.parser')
