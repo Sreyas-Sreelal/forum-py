@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import re
 import requests
 import forum.ext.errors
+from selenium.common.exceptions import WebDriverException
 
 class User:
     def __init__(self,id):
@@ -21,12 +22,13 @@ class User:
     def getlastactive(self,account):
         if not account.loggined:
             raise forum.ext.errors.MustLogin
+        last_online_dict = {}
         try:
             account.client.get('http://forum.sa-mp.com/member.php?u=' + self.id)
             soup = BeautifulSoup(account.client.page_source,'html.parser')
             last_online =  soup.find('div',id='last_online').text.strip()
             last_online = last_online[last_online.find(': ')+2:].strip()
-            last_online_dict = {}
+           
             last_online_dict['Date'] = last_online[:last_online.find(' ')]
             last_online_dict['Time'] = last_online[last_online.find(' ')+2:]
         except AttributeError:
@@ -81,5 +83,18 @@ class User:
         for i in range(0,length,2):
             info[data[i]] = data[i+1]
         return info
-        
     
+    def getcurrentactivity(self,account):
+        if not account.loggined:
+            raise forum.ext.errors.MustLogin
+        try:
+            account.client.get('http://forum.sa-mp.com/member.php?u=' + self.id)
+            soup = BeautifulSoup(account.client.page_source,'html.parser')
+            current_activity = soup.find('div',{'id':'activity_info'}).text
+            current_activity = current_activity[current_activity.find('Current Activity:')+18:].strip()
+        except AttributeError:
+            current_activity = "Offline"    
+            
+        return current_activity
+
+
