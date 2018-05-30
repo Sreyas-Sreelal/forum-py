@@ -2,6 +2,10 @@ import forum.ext.errors
 from bs4 import BeautifulSoup
 import re
 from selenium.common.exceptions import WebDriverException
+import requests
+import csv
+from io import StringIO
+import os
 
 class Account:
     def __init__(self,name,password):
@@ -45,7 +49,7 @@ class Account:
             self.id = soup.find('a',href=re.compile('member\.php\?u='))['href'][13:]
             return True
         
-        except WebDriverException:
+        except:
             return False
 
     def getcontacts(self):
@@ -105,4 +109,32 @@ class Account:
                 continue
 
         return threads
-                
+
+    def getpms(self):
+        self.client.get("http://forum.sa-mp.com/private.php?do=downloadpm&dowhat=csv")
+        print(self.client.current_url)
+        session = requests.Session()
+        cookies = self.client.get_cookies()
+
+        for cookie in cookies: 
+            session.cookies.set(cookie['name'], cookie['value'])
+
+        local_filename = self.name+"_temp.csv"
+        
+        r = session.get("http://forum.sa-mp.com/private.php?do=downloadpm&dowhat=csv",stream=True)
+        
+        if str(r) != "<Response [200]>":
+            raise forum.ext.errors.MustLogin
+
+        with open(local_filename, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=1024): 
+                if chunk: 
+                    f.write(chunk)
+        f.close()
+        
+        f = open(local_filename,'r')
+        reader = csv.DictReader(f)
+        f.close()
+        os.remove(local_filename)
+        
+        return list(reader)
