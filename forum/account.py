@@ -89,4 +89,20 @@ class Account:
         
         return userid
 
+    def getnew(self,max_number_threads=1000):
+        from forum.threads import Thread
+        self.client.get("http://forum.sa-mp.com/search.php?do=getnew")
+        self.client.get(self.client.current_url+"&pp="+str(max_number_threads))
+        soup = BeautifulSoup(self.client.page_source,'html.parser')
+                
+        thread_elements = soup.find_all('a',id=re.compile('^thread_title_'))
+        
+        threads = []
+        for te in thread_elements:
+            try:
+                threads.append(Thread(te['id'][13:]))
+            except:
+                continue
 
+        return threads
+                
