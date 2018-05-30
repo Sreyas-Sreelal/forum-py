@@ -112,7 +112,6 @@ class Account:
 
     def getpms(self):
         self.client.get("http://forum.sa-mp.com/private.php?do=downloadpm&dowhat=csv")
-        print(self.client.current_url)
         session = requests.Session()
         cookies = self.client.get_cookies()
 
