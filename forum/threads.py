@@ -24,7 +24,7 @@ class Thread:
     def __gettitle(self):
         request = requests.get("http://forum.sa-mp.com/showthread.php?t=" + self.id)
         soup = BeautifulSoup(request.content,'html.parser')
-        return soup.find('strong').text
+        return soup.find('strong').text.strip()
 
     def getrating(self,account):
         
