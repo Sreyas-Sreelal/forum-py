@@ -44,4 +44,11 @@ class RecipentLimitReached(Error):
     """
     pass
 
-    
+class MaxPMLimit(Error):
+    """
+    Raised when forum pm limit is reached (wait for 60 seconds before sending another pm)
+    """
+    pass
+
+
+

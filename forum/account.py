@@ -49,7 +49,7 @@ class Account:
             self.id = soup.find('a',href=re.compile('member\.php\?u='))['href'][13:]
             return True
         
-        except:
+        except WebDriverException:
             return False
 
     def getcontacts(self):
@@ -158,9 +158,15 @@ class Account:
             title_element.send_keys(title)
             contents_element.send_keys(content)
             send_button.click()
+
+            soup = BeautifulSoup(self.client.page_source,'html.parser')
+            islimit = soup.find(text=re.compile('This forum requires that you wait'))
+            if islimit is not None:
+                print("SDF")
+                raise forum.ext.errors.MaxPMLimit 
             return True
 
-        except:
+        except WebDriverException:
             return False
 
 
