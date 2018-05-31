@@ -38,5 +38,10 @@ class InvalidThreadId(Error):
     """
     pass
 
+class RecipentLimitReached(Error):
+    """
+    Raised when more than 5 number of recipents is used in the pm
+    """
+    pass
 
     
