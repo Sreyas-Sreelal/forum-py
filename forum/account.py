@@ -142,12 +142,15 @@ class Account:
     def send_pm(self,users,title,content):
         if len(users) > 5 :
             raise forum.ext.errors.RecipentLimitReached
+            
+        if users is None or title is None or content is None:
+            return False
         recipents = ""
 
-        for user in users:
-            recipents += user.name + ";"
-
         try:
+            for user in users:
+                recipents += user.name + ";"
+
             self.client.get("http://forum.sa-mp.com/private.php?do=newpm")
             recipents_element = self.client.find_element_by_id("pmrecips_txt")
             title_element = self.client.find_element_by_xpath( "//input[@name='title']")
