@@ -133,7 +133,34 @@ class Account:
         
         f = open(local_filename,'r')
         reader = csv.DictReader(f)
+        pms = list(reader)
         f.close()
         os.remove(local_filename)
         
-        return list(reader)
+        return pms
+
+    def send_pm(self,users,title,content):
+        if len(users) > 5 :
+            raise forum.ext.errors.RecipentLimitReached
+        recipents = ""
+
+        for user in users:
+            recipents += user.name + ";"
+
+        try:
+            self.client.get("http://forum.sa-mp.com/private.php?do=newpm")
+            recipents_element = self.client.find_element_by_id("pmrecips_txt")
+            title_element = self.client.find_element_by_xpath( "//input[@name='title']")
+            contents_element = self.client.find_element_by_id("vB_Editor_001_textarea")
+            send_button = self.client.find_element_by_id("vB_Editor_001_save")
+
+            recipents_element.send_keys(recipents)
+            title_element.send_keys(title)
+            contents_element.send_keys(content)
+            send_button.click()
+            return True
+
+        except:
+            return False
+
+
