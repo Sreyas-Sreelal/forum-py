@@ -23,12 +23,20 @@ from selenium.common.exceptions import WebDriverException
 import forum.ext.errors
 
 class Thread:
+    """Represents a SA-MP forum thread.
+        Example to create object: 
+            ``t = Thread(samp_forum_thread_id)``
+            returns a Thread object with attributes id,author and title initialised
+    """
     def __init__(self,id):
         self.id = id
         self.author = self.__getauthor()
         self.title = self.__gettitle()
-        
+    
+    #internals    
+    
     def __getauthor(self):
+         """Retrives current thread's author """
         try:
             request = requests.get("http://forum.sa-mp.com/showthread.php?t=" + self.id)
             soup = BeautifulSoup(request.content,'html.parser')
@@ -40,12 +48,30 @@ class Thread:
             raise forum.ext.errors.InvalidThreadId
         
     def __gettitle(self):
+        """Retrives current thread's title"""
         request = requests.get("http://forum.sa-mp.com/showthread.php?t=" + self.id)
         soup = BeautifulSoup(request.content,'html.parser')
         return soup.find('strong').text.strip()
 
     def getrating(self,account):
+        """
+        Retrives rating information of current thread
+
+        Parameters
+        -----------
+        account : :class:`Account`
+            Authorised forum account
         
+        Raises
+        -------
+        MustLogin
+            Passed :class:`Account` object is not authorised
+
+        Returns
+        --------
+        dictionary
+            A dictionary {'NoOfVotes':'total number of votes','Average':'Average rating point'}
+        """
         if not account.loggined:
             raise forum.ext.errors.MustLogin            
         try:
@@ -61,6 +87,14 @@ class Thread:
             return {'NoOfVotes':'0','Average':'0'}
 
     def getsubforum(self):
+        """
+        Retrives sub forums of current thread as a list
+
+        Returns
+        --------
+        list
+            A list of sub forum names
+        """
         request = requests.get("http://forum.sa-mp.com/showthread.php?t=" + self.id)
         soup = BeautifulSoup(request.content,'html.parser')
         sub_forums_elements = soup.find_all('a',href=re.compile('forumdisplay\.php\?f='))
@@ -71,12 +105,28 @@ class Thread:
         return sub_forums
 
     def getcontent(self):
+        """
+        Retrives sub forums of current thread as a list
+
+        Returns
+        --------
+        list
+            A list of sub forum names
+        """
         request = requests.get("http://forum.sa-mp.com/showthread.php?t=" + self.id)
         soup = BeautifulSoup(request.content,'html.parser')
         content = soup.find('div',id=re.compile('^post_message_')).text
         return content
 
     def getposts(self):
+        """
+        Retrives posts in current :class:`Thread` as a list
+
+        Returns
+        --------
+        list
+            A list of posts in :class:`Thread`
+        """
         request = requests.get("http://forum.sa-mp.com/printthread.php?t=" + self.id)
         soup = BeautifulSoup(request.content,'html.parser')
         all_post_html = soup.find_all('td',{'class':'page'})[1:]

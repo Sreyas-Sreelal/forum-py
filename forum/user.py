@@ -23,11 +23,19 @@ import forum.ext.errors
 from selenium.common.exceptions import WebDriverException
 
 class User:
+    """Represents a SA-MP forum user.
+        Example to create object: 
+            ``u = User(samp_forum_user_id)``
+            returns a User object with attributes id and name initialised
+    """
     def __init__(self,id):
         self.id = id
         self.name = self.__getusername()
-        
+    
+    # internals   
+     
     def __getusername(self):
+        """Retrives current user's name """
         try:
             request = requests.get('http://forum.sa-mp.com/member.php?u=' + self.id)
             soup = BeautifulSoup(request.content,'html.parser')
@@ -38,6 +46,24 @@ class User:
             raise forum.ext.errors.InvalidUserId 
 
     def getlastactive(self,account):
+        """
+        Retrives last active information of current user
+
+        Parameters
+        -----------
+        account : :class:`Account`
+            Authorised forum account
+        
+        Raises
+        -------
+        MustLogin
+            Passed :class:`Account` object is not authorised
+
+        Returns
+        --------
+        dictionary
+            A dictionary {'Date':'date of last active','Time':'time of last active'}
+        """
         if not account.loggined:
             raise forum.ext.errors.MustLogin
         last_online_dict = {}
@@ -55,11 +81,27 @@ class User:
         return last_online_dict
 
     def getforumlevel(self):
+        """
+        Retrives current user's forum level
+
+        Returns
+        --------
+        string
+            Forum level in string
+        """
         request = requests.get('http://forum.sa-mp.com/member.php?u=' + self.id)
         soup = BeautifulSoup(request.content,'html.parser')
         return soup.find('h2').text
 
     def getthreads(self):
+        """
+        Retrives list of threads created by current user
+
+        Returns
+        --------
+        list
+            A list of :class:`Thread`
+        """
         from forum.threads import Thread
         request = requests.get('http://forum.sa-mp.com/search.php?do=finduser&u=' + self.id + '&starteronly=1')
         soup = BeautifulSoup(request.content,'html.parser')
@@ -74,6 +116,14 @@ class User:
         return threads
 
     def getreputation(self):
+        """
+        Retrives current user's reputation points
+
+        Returns
+        --------
+        int
+            Reputation point of current user
+        """
         try:
             request = requests.get("http://forum.sa-mp.com/search.php?do=finduser&u=" + self.id )
             soup = BeautifulSoup(request.content,'html.parser')
@@ -92,6 +142,14 @@ class User:
         return reputation
         
     def info(self):
+        """
+        Retrives current user's information in profile field
+
+        Returns
+        --------
+        dictionary
+            dictionary with informations as key value pair
+        """
         request = requests.get('http://forum.sa-mp.com/member.php?u=' + self.id)
         soup = BeautifulSoup(request.content,'html.parser')
         data = soup.find('dl',{'class':'smallfont list_no_decoration profilefield_list'}).text.split('\n')
@@ -103,6 +161,19 @@ class User:
         return info
     
     def getcurrentactivity(self,account):
+        """
+        Retrives current activity of user.This function requires authorised :class:`Account`
+
+        Raises
+        -------
+        MustLogin
+            Passed :class:`Account` object is not authorised
+
+        Returns
+        --------
+        string
+            Current activity in string.If the user is offline the function returns "Offline"
+        """
         if not account.loggined:
             raise forum.ext.errors.MustLogin
         try:
