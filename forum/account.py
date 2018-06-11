@@ -134,7 +134,6 @@ class Account:
                         else:
                             break
                     except Exception as e:
-                        print(str(e))
                         raise forum.ext.errors.InvalidUserId
         
         except:
@@ -227,7 +226,7 @@ class Account:
 
         Raises
         -------
-        MaxPMLimit
+        RecipentLimitReached
             More than 5 recipents are specified
 
         Returns
@@ -267,7 +266,6 @@ class Account:
             soup = BeautifulSoup(self.client.page_source,'html.parser')
             islimit = soup.find(text=re.compile('This forum requires that you wait'))
             if islimit is not None:
-                print("SDF")
                 raise forum.ext.errors.MaxPMLimit 
             return True
 
