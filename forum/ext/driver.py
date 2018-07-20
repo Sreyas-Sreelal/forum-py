@@ -25,6 +25,6 @@ try:
     client.get("http://forum.sa-mp.com")
 
 except common.exceptions.WebDriverException:
-    raise DriverLoadError("Selenium driver is not found")
+    raise DriverLoadError("Selenium driver is not found [PhantomJs needs to be in PATH]")
 
     
