@@ -36,7 +36,7 @@ class Thread:
     #internals    
     
     def __getauthor(self):
-         """Retrives current thread's author """
+        """Retrives current thread's author """
         try:
             request = requests.get("http://forum.sa-mp.com/showthread.php?t=" + self.id)
             soup = BeautifulSoup(request.content,'html.parser')
