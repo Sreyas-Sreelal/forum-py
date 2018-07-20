@@ -1,7 +1,13 @@
 # forum-py
-[![GitHub issues](https://img.shields.io/github/issues/Sreyas-Sreelal/forum-py.svg)]() [![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/sreyas-sreelal/forum-py.svg)]() [![GitHub pull license](https://img.shields.io/github/license/sreyas-sreelal/forum-py.svg)]()
+[![GitHub issues](https://img.shields.io/github/issues/Sreyas-Sreelal/forum-py.svg)]() [![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/sreyas-sreelal/forum-py.svg)]() [![GitHub pull license](https://img.shields.io/github/license/sreyas-sreelal/forum-py.svg)]() [![GitHub pull license](https://img.shields.io/pypi/v/forumpy.svg)]() [![GitHub pull license](https://img.shields.io/pypi/pyversions/forumpy.svg)]()
+
 >forumpy is an unofficial SA-MP forum api.This python library ,integerated with selenium and phantomJS,helps you to automate SA-MP forum acitivities like send and get pms,threads,userinfo,contacts etc.Please view the example files for information about using these features in your python application.forumpy is still under development and has not yet been released.
 
+## Installing
+Use pip to install latest version of forumpy
+```
+pip install forumpy
+```
 ## Quick examples
 * ###  Basic 
   ```Python
