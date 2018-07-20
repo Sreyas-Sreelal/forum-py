@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="forumpy",
-    version="0.0.1",
+    version="0.0.2",
     author="Sreyas Sreelal",
     author_email="sreyassreelal@gmail.com.com",
     description="An unofficial SA-MP forum api",
