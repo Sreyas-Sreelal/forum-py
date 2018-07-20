@@ -191,4 +191,21 @@ class User:
             
         return current_activity
 
+    def getsignaturetext(self):
+        """
+        Retrives singature text of user specified.
+
+        Returns
+        --------
+        string
+            Signature text in string.If no signature returns None
+        """
+        try:
+            request = requests.get("https://forum.sa-mp.com/member.php?u=" + self.id)
+            soup = BeautifulSoup(request.content,"html.parser")
+            signature = soup.find("dd",{'id':'signature'}).text
+            return signature
+        except:
+            return None
+
 
