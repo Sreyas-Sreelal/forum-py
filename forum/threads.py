@@ -28,7 +28,8 @@ class Thread:
             ``t = Thread(samp_forum_thread_id)``
             returns a Thread object with attributes id,author and title initialised
     """
-    def __init__(self,id):
+    def __init__(self,account,id):
+        self.account = account
         self.id = id
         self.author = self.__getauthor()
         self.title = self.__gettitle()
@@ -38,19 +39,19 @@ class Thread:
     def __getauthor(self):
         """Retrives current thread's author """
         try:
-            request = requests.get("http://forum.sa-mp.com/showthread.php?t=" + self.id)
-            soup = BeautifulSoup(request.content,'html.parser')
+            self.account.client.get("http://forum.sa-mp.com/showthread.php?t=" + self.id)
+            soup = BeautifulSoup(self.account.client.page_source,'html.parser')
             from forum.user import User
             #self.client.find_element_by_xpath("//*[contains(@class, 'bigusername')]").get_attribute('href')[36:]
-            return User(soup.find('a',{'class':'bigusername'})['href'][13:])
+            return User(self.account,soup.find('a',{'class':'bigusername'})['href'][13:])
         
         except:
             raise forum.ext.errors.InvalidThreadId
         
     def __gettitle(self):
         """Retrives current thread's title"""
-        request = requests.get("http://forum.sa-mp.com/showthread.php?t=" + self.id)
-        soup = BeautifulSoup(request.content,'html.parser')
+        self.account.client.get("http://forum.sa-mp.com/showthread.php?t=" + self.id)
+        soup = BeautifulSoup(self.account.client.page_source,'html.parser')
         return soup.find('strong').text.strip()
 
     def getrating(self,account):
@@ -95,8 +96,8 @@ class Thread:
         list
             A list of sub forum names
         """
-        request = requests.get("http://forum.sa-mp.com/showthread.php?t=" + self.id)
-        soup = BeautifulSoup(request.content,'html.parser')
+        self.account.client.get("http://forum.sa-mp.com/showthread.php?t=" + self.id)
+        soup = BeautifulSoup(self.account.client.page_source,'html.parser')
         sub_forums_elements = soup.find_all('a',href=re.compile('forumdisplay\.php\?f='))
         #sub_forums_elements = self.client.find_elements_by_xpath("//*[starts-with(@href, 'forumdisplay.php?f=')]")
         sub_forums = []
@@ -113,8 +114,8 @@ class Thread:
         list
             A list of sub forum names
         """
-        request = requests.get("http://forum.sa-mp.com/showthread.php?t=" + self.id)
-        soup = BeautifulSoup(request.content,'html.parser')
+        self.account.client.get("http://forum.sa-mp.com/showthread.php?t=" + self.id)
+        soup = BeautifulSoup(self.account.client.page_source,'html.parser')
         content = soup.find('div',id=re.compile('^post_message_')).text
         return content
 
@@ -127,8 +128,8 @@ class Thread:
         list
             A list of posts in :class:`Thread`
         """
-        request = requests.get("http://forum.sa-mp.com/printthread.php?t=" + self.id)
-        soup = BeautifulSoup(request.content,'html.parser')
+        self.account.client.get("http://forum.sa-mp.com/printthread.php?t=" + self.id)
+        soup = BeautifulSoup(self.account.client.page_source,'html.parser')
         all_post_html = soup.find_all('td',{'class':'page'})[1:]
         
         try:
@@ -138,8 +139,8 @@ class Thread:
             total_pages = 1
 
         for i in range(2,total_pages+1):
-            request = requests.get("http://forum.sa-mp.com/printthread.php?t=" + self.id + "&pp=40&page=" + str(i) )
-            soup = BeautifulSoup(request.content,'html.parser')
+            self.account.client.get("http://forum.sa-mp.com/printthread.php?t=" + self.id + "&pp=40&page=" + str(i) )
+            soup = BeautifulSoup(self.account.client.page_source,'html.parser')
             all_post_html = all_post_html + soup.find_all('td',{'class':'page'})
         
         posts_raw = [p.text.strip() for p in all_post_html]

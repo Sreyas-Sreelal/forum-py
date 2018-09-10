@@ -18,13 +18,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from selenium import webdriver
 from selenium import common
+from selenium.webdriver.support import expected_conditions  
+from selenium.webdriver.support.ui import WebDriverWait
 from forum.ext.errors import DriverLoadError
 
 try:
-    client = webdriver.PhantomJS()
+    options = webdriver.ChromeOptions()
+    #options.add_argument('--headless')
+    client = webdriver.Chrome(chrome_options=options)
+    wait = WebDriverWait(client,10)
     client.get("http://forum.sa-mp.com")
+    wait.until(expected_conditions.title_is('SA-MP Forums - Powered by vBulletin'))
 
+except common.exceptions.TimeoutException:
+    raise TimeoutError('Connection to forum is timed out')
 except common.exceptions.WebDriverException:
-    raise DriverLoadError("Selenium driver is not found [PhantomJs needs to be in PATH]")
+    raise DriverLoadError("[Driver is not found] Chrome driver needs to be in PATH")
 
     

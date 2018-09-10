@@ -18,7 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from bs4 import BeautifulSoup
 import re
-import requests
 import forum.ext.errors
 from selenium.common.exceptions import WebDriverException
 
@@ -28,24 +27,25 @@ class User:
             ``u = User(samp_forum_user_id)``
             returns a User object with attributes id and name initialised
     """
-    def __init__(self,id):
+    def __init__(self,account,id):
+        self.account = account
         self.id = id
         self.name = self.__getusername()
-    
+       
     # internals   
      
     def __getusername(self):
         """Retrives current user's name """
         try:
-            request = requests.get('http://forum.sa-mp.com/member.php?u=' + self.id)
-            soup = BeautifulSoup(request.content,'html.parser')
+            self.account.client.get('http://forum.sa-mp.com/member.php?u=' + self.id)
+            soup = BeautifulSoup(self.account.client.page_source,'html.parser')
             name = str(soup.find('h1').text.strip())
             return name
         
         except:
             raise forum.ext.errors.InvalidUserId 
 
-    def getlastactive(self,account):
+    def getlastactive(self):
         """
         Retrives last active information of current user
 
@@ -64,12 +64,12 @@ class User:
         dictionary
             A dictionary {'Date':'date of last active','Time':'time of last active'}
         """
-        if not account.loggined:
+        if not self.account.loggined:
             raise forum.ext.errors.MustLogin
         last_online_dict = {}
         try:
-            account.client.get('http://forum.sa-mp.com/member.php?u=' + self.id)
-            soup = BeautifulSoup(account.client.page_source,'html.parser')
+            self.account.client.get('http://forum.sa-mp.com/member.php?u=' + self.id)
+            soup = BeautifulSoup(self.account.client.page_source,'html.parser')
             last_online =  soup.find('div',id='last_online').text.strip()
             last_online = last_online[last_online.find(': ')+2:].strip()
            
@@ -89,8 +89,8 @@ class User:
         string
             Forum level in string
         """
-        request = requests.get('http://forum.sa-mp.com/member.php?u=' + self.id)
-        soup = BeautifulSoup(request.content,'html.parser')
+        self.account.client.get('http://forum.sa-mp.com/member.php?u=' + self.id)
+        soup = BeautifulSoup(self.account.client.page_source,'html.parser')
         return soup.find('h2').text
 
     def getthreads(self):
@@ -103,8 +103,8 @@ class User:
             A list of :class:`Thread`
         """
         from forum.threads import Thread
-        request = requests.get('http://forum.sa-mp.com/search.php?do=finduser&u=' + self.id + '&starteronly=1')
-        soup = BeautifulSoup(request.content,'html.parser')
+        self.account.client.get('http://forum.sa-mp.com/search.php?do=finduser&u=' + self.id + '&starteronly=1')
+        soup = BeautifulSoup(self.account.client.page_source,'html.parser')
         thread_elements = soup.find_all("a", id=re.compile("^thread_title_"))
 
         threads = []
@@ -125,11 +125,11 @@ class User:
             Reputation point of current user
         """
         try:
-            request = requests.get("http://forum.sa-mp.com/search.php?do=finduser&u=" + self.id )
-            soup = BeautifulSoup(request.content,'html.parser')
+            self.account.client.get("http://forum.sa-mp.com/search.php?do=finduser&u=" + self.id )
+            soup = BeautifulSoup(self.account.client.page_source,'html.parser')
             post = soup.find('a',href=re.compile('^showthread\.php\?p='))['href']
-            request = requests.get("http://forum.sa-mp.com/"+post)
-            soup = BeautifulSoup(request.content,'html.parser')
+            self.account.client.get("http://forum.sa-mp.com/"+post)
+            soup = BeautifulSoup(self.account.client.page_source,'html.parser')
             scrap_soup = soup.find('a',href=re.compile('u='+self.id)).find_next('div',{'class':'smallfont'}).find_next('div',{'class':'smallfont'}).find_next('div',{'class':'smallfont'}) 
             scrap_info = scrap_soup.text
             reputation = int(scrap_info[scrap_info.rfind('Reputation:')+12:].strip())
@@ -150,8 +150,8 @@ class User:
         dictionary
             dictionary with informations as key value pair
         """
-        request = requests.get('http://forum.sa-mp.com/member.php?u=' + self.id)
-        soup = BeautifulSoup(request.content,'html.parser')
+        self.account.client.get('http://forum.sa-mp.com/member.php?u=' + self.id)
+        soup = BeautifulSoup(self.account.client.page_source,'html.parser')
         data = soup.find('dl',{'class':'smallfont list_no_decoration profilefield_list'}).text.split('\n')
         data = list(filter(('').__ne__, data))
         length = len(data)
@@ -160,7 +160,7 @@ class User:
             info[data[i]] = data[i+1]
         return info
     
-    def getcurrentactivity(self,account):
+    def getcurrentactivity(self):
         """
         Retrives current activity of user.This function requires authorised :class:`Account`
 
@@ -174,11 +174,11 @@ class User:
         string
             Current activity in string.If the user is offline the function returns "Offline"
         """
-        if not account.loggined:
+        if not self.account.loggined:
             raise forum.ext.errors.MustLogin
         try:
-            account.client.get('http://forum.sa-mp.com/member.php?u=' + self.id)
-            soup = BeautifulSoup(account.client.page_source,'html.parser')
+            self.account.client.get('http://forum.sa-mp.com/member.php?u=' + self.id)
+            soup = BeautifulSoup(self.account.client.page_source,'html.parser')
             current_activity = soup.find('div',{'id':'activity_info'}).text
             idx = current_activity.find('Current Activity:')
             
@@ -201,8 +201,8 @@ class User:
             Signature text in string.If no signature returns None
         """
         try:
-            request = requests.get("https://forum.sa-mp.com/member.php?u=" + self.id)
-            soup = BeautifulSoup(request.content,"html.parser")
+            self.account.client.get("https://forum.sa-mp.com/member.php?u=" + self.id)
+            soup = BeautifulSoup(self.account.client.page_source,"html.parser")
             signature = soup.find("dd",{'id':'signature'}).text
             return signature
         except:

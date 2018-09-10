@@ -40,7 +40,7 @@ class Account:
 
         else:
             from forum.user import User
-            self.User = User(self.id)
+            self.User = User(self,self.id)
             self.name = name
             self.loggined = True
     
@@ -94,7 +94,7 @@ class Account:
         elements = soup.find_all('a',{"title":"View Profile"})
         #elements = self.client.find_elements_by_xpath("//*[starts-with(@href, 'member.php?u=') and contains(@title,'View Profile')]")
         for element in elements:
-            contacts.append(User(element['href'][13:]))
+            contacts.append(User(self,element['href'][13:]))
         return contacts
 
     def getIdFromUserName(self,username):
