@@ -29,7 +29,7 @@ while True:
         name2search = input("Input name of user : ")
         id = a.getIdFromUserName(name2search)
         print("\n\nUser id is : ",id)
-        u = User(id)
+        u = User(a,id)
         info = u.info()
 
         print("Name : ",u.name)
@@ -37,7 +37,7 @@ while True:
         for i,j in info.items():
             print(i," : ",j)
         print("Reputation : ",u.getreputation())
-        print("Last online : ",u.getlastactive(a))
+        print("Last online : ",u.getlastactive())
 
     except InvalidUserId:
         print("Invalid user name")

@@ -1,5 +1,3 @@
-from forum.threads import Thread
-
 # -*- coding: utf-8 -*-
 """
 Copyright (C) 2018  Sreyas Sreelal
@@ -17,8 +15,14 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from forum.threads import Thread
+from forum.account import Account
 
-t = Thread(input("Input thread id : "))
+name = input("Input forum username : ")
+password = input("Input forum password : ")
+a = Account(name,password)
+
+t = Thread(a,input("Input thread id : "))
 print("*****Content*****\n",t.getcontent())
 print("Author: ",t.author.name)
 print("******Posts******\n")
